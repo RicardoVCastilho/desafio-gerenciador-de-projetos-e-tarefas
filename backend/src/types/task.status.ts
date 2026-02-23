@@ -1,0 +1,1 @@
+export type TaskStatus = "a_fazer" | "em_progresso" | "feito"
