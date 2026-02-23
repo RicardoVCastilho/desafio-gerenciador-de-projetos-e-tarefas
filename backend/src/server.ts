@@ -1,17 +1,19 @@
-import "dotenv/config"
-import app from "./app"
-import mongoose from "mongoose"
+import dotenv from "dotenv";
+dotenv.config();
 
-const PORT = 3000
+import app from "./app";
+import mongoose from "mongoose";
+
+const PORT = 3000;
 
 mongoose.connect(process.env.MONGO_URL as string)
   .then(() => {
-    console.log("Banco de dados conectado")
+    console.log("Banco de dados conectado");
 
     app.listen(PORT, () => {
-      console.log(` Servidor rodando na porta ${PORT}`)
-    })
+      console.log(`Servidor rodando na porta ${PORT}`);
+    });
   })
   .catch((error) => {
-    console.error("Erro ao conectar no Banco:", error)
-  })
+    console.error("Erro ao conectar no Banco:", error);
+  });
