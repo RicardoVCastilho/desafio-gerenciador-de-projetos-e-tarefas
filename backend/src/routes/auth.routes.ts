@@ -7,4 +7,8 @@ const router = Router()
 router.post("/register", register)
 router.post("/login", login)
 
+router.get("/me", authMiddleware, (req: any, res) => {
+  res.json({ userId: req.userId })
+})
+
 export default router
