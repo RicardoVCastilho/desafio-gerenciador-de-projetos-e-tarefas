@@ -80,7 +80,6 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { title, description } = req.body;
 
-    // 1️⃣ Buscar projeto
     const project = await Project.findOne({
       _id: id,
       user: req.userId,
@@ -92,14 +91,12 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
       });
     }
 
-    // 2️⃣ Validar se está concluído
     if (project.status === "concluido") {
       return res.status(400).json({
         message: "Não é possível editar um projeto concluído.",
       });
     }
 
-    // 3️⃣ Atualizar campos permitidos
     if (title !== undefined) project.title = title;
     if (description !== undefined) project.description = description;
 
@@ -115,7 +112,6 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
 
 export const deleteProject = async (req: Request, res: Response) => {
   try {
-    // 🔹 Usa o nome correto do parâmetro da rota
     const { id: projectIdRaw } = req.params;
 
     const projectId = Array.isArray(projectIdRaw)

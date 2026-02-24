@@ -9,28 +9,24 @@ export const register = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
-    // Validação da versão 2.0 - Básica
     if (!name || !email || !password) {
       return res.status(400).json({
         message: "Nome, email e senha são obrigatórias.",
       });
     }
 
-    // Validação da versão 2.0 - Senha com no mínimo 6 caracteres
     if (password.length < 6) {
       return res.status(400).json({
         message: "A senha deve ter no mínimo 6 caracteres.",
       });
     }
 
-    //Validação da versão 2.0 - Normaliza o e-mail para minúsculo e utiliza a lib "validator" para conferir se é um e-mail que existe de fato
     const normalizedEmail = email.toLowerCase();
 
     if (!validator.isEmail(normalizedEmail)) {
       return res.status(400).json({ message: "E-mail inválido." });
     }
 
-    // Velidação se o usuário já existe no banco
     const userExists = await User.findOne({ email: normalizedEmail });
 
     if (userExists) {
@@ -57,7 +53,6 @@ export const login = async (req: Request, res: Response) => {
   try {
     const { email, password } = req.body;
 
-    // Validações 2.0 de campos obrigatórios
     if (!email || !password) {
       return res
         .status(400)
@@ -66,7 +61,6 @@ export const login = async (req: Request, res: Response) => {
 
     const normalizedEmail = email.toLowerCase();
 
-    //Validação 2.0  de formato - usando a lib
     if (!validator.isEmail(normalizedEmail)) {
       return res.status(400).json({ message: "E-mail inválido." });
     }

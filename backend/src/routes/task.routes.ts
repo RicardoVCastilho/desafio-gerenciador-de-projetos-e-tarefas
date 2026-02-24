@@ -4,14 +4,12 @@ import { createTask, getTasksByProject, searchTasks, updateTask, updateTaskStatu
 
 const router = Router()
 
-// 🔎 Rotas específicas primeiro
 router.get("/search", authMiddleware, searchTasks)
 router.get("/project/:projectId", authMiddleware, getTasksByProject)
 router.get("/me", authMiddleware, (req: any, res) => {
   res.json({ userId: req.userId })
 })
 
-// 🧱 Rotas dinâmicas depois
 router.put("/:taskId", authMiddleware, updateTask)
 router.patch("/:taskId/status", authMiddleware, updateTaskStatus)
 router.delete("/:taskId", authMiddleware, deleteTask)
