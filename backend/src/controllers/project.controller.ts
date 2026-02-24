@@ -1,5 +1,7 @@
 import { Request, Response} from "express"
 import { Project } from "../models/Project"
+import { Task } from "../models/Task"
+import mongoose from "mongoose"
 
 interface AuthRequest extends Request {
     userId?: string
@@ -77,18 +79,33 @@ export const updateProject = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ message: "Erro ao atualizar o projeto."})
     }
 }
+export const deleteProject = async (req: Request, res: Response) => {
+  try {
+    // 🔹 Usa o nome correto do parâmetro da rota
+    const { id: projectIdRaw } = req.params
 
-export const deleteProjects = async (req: AuthRequest, res: Response) => {
-    try {
-        const { id } = req.params
+    const projectId = Array.isArray(projectIdRaw) ? projectIdRaw[0] : projectIdRaw
 
-        await Project.findOneAndDelete({
-            _id: id,
-            user: req.userId,
-        })
-
-        res.json({ message: "Projeto removido."})
-    } catch (error) {
-        res.status(500).json({ message: "Erro ao remover o projeto."})
+    if (!mongoose.Types.ObjectId.isValid(projectId)) {
+      return res.status(400).json({ message: "ID do projeto inválido." })
     }
+
+    const userId = new mongoose.Types.ObjectId(req.userId)
+
+    const project = await Project.findOneAndDelete({
+      _id: projectId,
+      user: userId,
+    })
+
+    if (!project) {
+      return res.status(404).json({ message: "Projeto não encontrado." })
+    }
+
+    await Task.deleteMany({ project: project._id })
+
+    res.json({ message: "Projeto e tarefas removidos com sucesso." })
+  } catch (error) {
+    console.log(error)
+    res.status(500).json({ message: "Erro ao deletar projeto." })
+  }
 }
