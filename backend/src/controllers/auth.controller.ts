@@ -85,7 +85,15 @@ export const login = async (req: Request, res: Response) => {
       expiresIn: "1d",
     });
 
-    return res.json({message: "Usuário logado com sucesso", token });
+    return res.json({
+      message: "Usuário logado com sucesso",
+      token,
+      user: {
+        name: user.name,
+        email: user.email,
+        id: user._id
+      }, 
+    });
 
   } catch (error) {
   console.error("ERRO LOGIN:", error);

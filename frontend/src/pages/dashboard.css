@@ -1,0 +1,203 @@
+/* Dashboard.css */
+
+/* Container principal */
+.dashboard-container {
+  display: flex;
+  min-height: 100vh;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+/* Sidebar */
+.dashboard-sidebar {
+  width: 260px;
+  background-color: #1f1f1f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 2rem 1rem;
+  box-shadow: 3px 0 10px rgba(0,0,0,0.3);
+}
+
+.dashboard-sidebar h1 {
+  font-size: 2rem;
+  margin-bottom: 3rem;
+  letter-spacing: 1px;
+  text-align: center;
+}
+
+.projects-link {
+  font-size: 1.3rem;
+  color: #fff;
+  text-decoration: none;
+  margin-bottom: 3rem;
+  position: relative;
+}
+
+.projects-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #ff7f50, #ffb347);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.projects-link:hover::after {
+  transform: scaleX(1);
+}
+
+.sidebar-user {
+  text-align: center;
+  margin-top: auto;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+}
+
+.sidebar-buttons button {
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.sidebar-buttons button:hover {
+  background: linear-gradient(90deg, #6366f1, #4f46e5);
+  transform: scale(1.05);
+}
+/* Conteúdo principal */
+.dashboard-main {
+  flex: 1;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2rem;
+}
+
+/* Grid dos projetos agora é coluna */
+.projects-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+/* Card de projeto */
+.project-card {
+  background: linear-gradient(145deg, #ffffff, #f9f9f9);
+  padding: 1.8rem;
+  border-radius: 16px;
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.12);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.project-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.18);
+}
+
+.project-card h2 {
+  font-size: 1.4rem;
+  margin-bottom: 0.75rem;
+  color: #111827;
+}
+
+.project-card p {
+  font-size: 1rem;
+  margin-bottom: 1.2rem;
+  color: #6b7280;
+  line-height: 1.4;
+}
+
+.project-card button {
+  align-self: flex-start;
+  background-color: #4f46e5;
+  color: #fff;
+  border: none;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 500;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);
+}
+
+.project-card button:hover {
+  background-color: #6366f1;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+  transform: translateY(-2px);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .dashboard-container {
+    flex-direction: column;
+  }
+
+  /* Sidebar agora no topo */
+  .dashboard-sidebar {
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    box-shadow: none;
+  }
+
+  .dashboard-sidebar h1 {
+    font-size: 1.5rem;
+    margin: 0;
+  }
+
+  .projects-link {
+    margin: 0 1rem;
+  }
+
+  .sidebar-user {
+    display: none; /* oculta usuário para não ocupar espaço em telas pequenas */
+  }
+
+  .sidebar-buttons button {
+    width: auto;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+
+  .dashboard-main {
+    padding: 1rem;
+    gap: 1rem;
+  }
+
+  .projects-grid {
+    gap: 1rem;
+  }
+
+  .project-card h2 {
+    font-size: 1.2rem;
+  }
+
+  .project-card p {
+    font-size: 0.9rem;
+  }
+
+  .project-card button {
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+  }
+}
