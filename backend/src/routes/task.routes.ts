@@ -4,6 +4,7 @@ import { createTask, getTasksByProject, searchTasks, updateTask, updateTaskStatu
 
 const router = Router()
 
+router.post("/", authMiddleware, createTask)
 router.get("/search", authMiddleware, searchTasks)
 router.get("/project/:projectId", authMiddleware, getTasksByProject)
 router.get("/me", authMiddleware, (req: any, res) => {
