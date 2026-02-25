@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import api from "../api/axios";
 import "./Login.css";
 
@@ -8,27 +9,29 @@ function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    if (!email || !password) {
+      toast.error("Preencha email e senha.");
+      return;
+    }
+
     setLoading(true);
-    setError("");
 
     try {
       const res = await api.post("/auth/login", { email, password });
 
-      // Salva o token
       localStorage.setItem("token", res.data.token);
-
-      // Salva os dados do usuário
-      // Certifique-se que o backend retorna { name, email } junto do login
       localStorage.setItem("user", JSON.stringify(res.data.user));
 
-      // Redireciona para dashboard
+      const userName = res.data?.user?.name;
+      toast.success(userName ? `Bem-vindo, ${userName}!` : "Login realizado com sucesso!");
+
       navigate("/dashboard");
     } catch (err: any) {
-      setError(err.response?.data?.message || "Erro ao logar");
+      toast.error(err.response?.data?.message || "Erro ao logar");
     } finally {
       setLoading(false);
     }
@@ -61,8 +64,6 @@ function Login() {
       <p>
         Ainda não possui uma conta? <Link to="/register">Registre-se</Link>
       </p>
-
-      {error && <p className="error">{error}</p>}
     </div>
   );
 }

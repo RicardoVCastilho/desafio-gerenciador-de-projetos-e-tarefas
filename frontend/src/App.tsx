@@ -3,7 +3,8 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import Projects from "./pages/projects";
-import ProjectDetails from "./components/projectdetails/projectdetails";
+import ProjectDetails from "./components/projectDetails/projectDetails";
+import { Toaster } from "sonner";
 
 function App() {
   return (
@@ -13,8 +14,10 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/projects/:id" element={<ProjectDetails />} />
-        <Route path="/projects" element={<Projects/>}/>
+        <Route path="/projects" element={<Projects />} />
       </Routes>
+
+      <Toaster richColors position="bottom-right" />
     </BrowserRouter>
   );
 }

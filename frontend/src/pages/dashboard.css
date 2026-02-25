@@ -1,11 +1,8 @@
-/* Dashboard.css */
-
 .dashboard-shell {
   min-height: 100vh;
   background-color: #f5f5f5;
 }
 
-/* Layout principal */
 .dashboard-container {
   display: flex;
   min-height: 100vh;
@@ -14,7 +11,6 @@
   overflow: hidden;
 }
 
-/* Conteúdo */
 .dashboard-main {
   flex: 1;
   padding: 2rem;
@@ -25,14 +21,12 @@
   overflow-y: auto;
 }
 
-/* Grid */
 .projects-grid {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
 }
 
-/* Card */
 .project-card {
   background: linear-gradient(145deg, #ffffff, #f9f9f9);
   padding: 1.8rem;
@@ -82,22 +76,19 @@
   transform: translateY(-2px);
 }
 
-/* ✅ TopBar mobile */
 .dashboard-topbar {
   display: none;
 }
 
-/* ✅ trava a largura da sidebar no layout flex */
 .dashboard-container .dashboard-sidebar {
-  flex: 0 0 260px;  /* não encolhe e não cresce */
+  flex: 0 0 260px;
   width: 260px;
 }
 
-/* ✅ impede o main de empurrar/estourar a sidebar */
 .dashboard-main {
   flex: 1;
-  min-width: 0;       /* MUITO importante em flex */
-  overflow-x: hidden; /* evita overflow horizontal */
+  min-width: 0;      
+  overflow-x: hidden;
 }
 
 @media (max-width: 768px) {
@@ -107,8 +98,6 @@
     height: 56px;
     padding: 0 12px;
     background: #ffffff;
-
-    /* ✅ FIXED em vez de sticky */
     position: fixed;
     top: 0;
     left: 0;
@@ -153,7 +142,7 @@
 
   .dashboard-main {
     padding: 1rem;
-    padding-top: calc(1rem + 56px); /* ✅ não fica por baixo da topbar */
+    padding-top: calc(1rem + 56px);
     gap: 1rem;
   }
 }

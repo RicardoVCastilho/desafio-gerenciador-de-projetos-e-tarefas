@@ -134,7 +134,6 @@ export default function ProjectDetails() {
           </div>
         </header>
 
-        {/* Cards */}
         <section className="pd-grid">
           <article className="pd-card">
             <h3 className="pd-card-title">Descrição</h3>
@@ -162,7 +161,6 @@ export default function ProjectDetails() {
           </article>
         </section>
 
-        {/* Tasks */}
         <section className="pd-card">
           <div className="pd-card-head">
             <h3 className="pd-card-title">Tarefas</h3>

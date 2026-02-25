@@ -52,7 +52,6 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
   const token = localStorage.getItem("token");
   const navigate = useNavigate();
 
-  // ✅ Fecha no ESC + trava scroll do body
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -99,7 +98,9 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
   const stats = useMemo(() => {
     const tasks = project?.tasks || [];
     const total = tasks.length;
-    const done = tasks.filter((t) => normalizeStatus(t.status) === "concluido").length;
+    const done = tasks.filter(
+      (t) => normalizeStatus(t.status) === "concluido",
+    ).length;
     const pending = total - done;
     return { total, done, pending };
   }, [project]);
@@ -116,7 +117,6 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
           ✕
         </button>
 
-        {/* ✅ Scroll só aqui (não na borda do card) */}
         <div className="pdm-scroll">
           <div className="pd-shell pd-shell-modal">
             <div className="pd-container">
@@ -137,13 +137,18 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
 
                     <div className="pd-header-main">
                       <h1 className="pd-title">{project.title}</h1>
-                      <span className={`pd-badge pd-badge-${normalizeStatus(project.status)}`}>
+                      <span
+                        className={`pd-badge pd-badge-${normalizeStatus(project.status)}`}
+                      >
                         {statusLabel(project.status)}
                       </span>
                     </div>
 
                     <div className="pd-header-actions">
-                      <button className="pd-btn pd-btn-secondary" onClick={goProjects}>
+                      <button
+                        className="pd-btn pd-btn-secondary"
+                        onClick={goProjects}
+                      >
                         Ver projetos
                       </button>
                     </div>
@@ -153,7 +158,9 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
                     <article className="pd-card">
                       <h3 className="pd-card-title">Descrição</h3>
                       <p className="pd-text">
-                        {project.description?.trim() ? project.description : "Sem descrição."}
+                        {project.description?.trim()
+                          ? project.description
+                          : "Sem descrição."}
                       </p>
                     </article>
 
@@ -191,13 +198,19 @@ export default function ProjectDetailsModal({ projectId, onClose }: Props) {
                           return (
                             <div key={task._id} className="pd-task">
                               <div className="pd-task-top">
-                                <strong className="pd-task-title">{task.title}</strong>
-                                <span className={`pd-badge pd-badge-${tStatus}`}>
+                                <strong className="pd-task-title">
+                                  {task.title}
+                                </strong>
+                                <span
+                                  className={`pd-badge pd-badge-${tStatus}`}
+                                >
                                   {statusLabel(task.status)}
                                 </span>
                               </div>
                               <p className="pd-task-desc">
-                                {task.description?.trim() ? task.description : "Sem descrição."}
+                                {task.description?.trim()
+                                  ? task.description
+                                  : "Sem descrição."}
                               </p>
                             </div>
                           );

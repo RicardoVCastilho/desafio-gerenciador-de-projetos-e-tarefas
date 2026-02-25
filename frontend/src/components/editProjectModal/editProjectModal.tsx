@@ -21,7 +21,6 @@ export default function EditProjectModal({ project, onClose, onSave }: Props) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string>("");
 
-  // ESC + trava scroll
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
@@ -37,8 +36,8 @@ export default function EditProjectModal({ project, onClose, onSave }: Props) {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  },
+   []);
 
   const canSave = title.trim().length > 0 && description.trim().length > 0 && !saving;
 

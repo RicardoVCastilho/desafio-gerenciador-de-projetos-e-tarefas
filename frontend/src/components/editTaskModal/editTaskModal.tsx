@@ -35,8 +35,8 @@ export default function EditTaskModal({ task, onClose, onSave }: Props) {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKeyDown);
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  },
+   []);
 
   const canSave = title.trim().length > 0 && description.trim().length > 0 && !saving;
 

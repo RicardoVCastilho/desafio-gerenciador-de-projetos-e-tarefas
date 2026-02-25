@@ -1,4 +1,3 @@
-/* Sidebar principal */
 .dashboard-sidebar {
   width: 260px;
   background-color: #1f1f1f;
@@ -8,10 +7,9 @@
   padding: 1rem;
   box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
   height: 100vh;
-  transition: transform 0.3s ease; /* ✅ melhor que "all" */
+  transition: transform 0.3s ease;
 }
 
-/* Cabeçalho */
 .sidebar-header {
   display: flex;
   align-items: center;
@@ -24,12 +22,11 @@
   color: #fff;
 }
 
-/* Conteúdo principal */
 .sidebar-main {
   display: flex;
   flex-direction: column;
   margin-top: 2rem;
-  flex: 1; /* empurra o footer para baixo */
+  flex: 1;
 }
 
 .sidebar-nav {
@@ -63,7 +60,6 @@
   transform: scaleX(1);
 }
 
-/* Footer com usuário e botão */
 .sidebar-footer {
   margin-top: auto;
   display: flex;
@@ -94,7 +90,6 @@
   transform: scale(1.03);
 }
 
-/* MOBILE */
 @media (max-width: 768px) {
   .dashboard-sidebar {
     position: fixed;
@@ -105,9 +100,7 @@
     transform: translateX(-100%);
     z-index: 1400;
     background-color: #1f1f1f;
-
-    /* ✅ melhorias */
-    overflow-y: auto; /* se tiver muito conteúdo */
+    overflow-y: auto;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -115,12 +108,10 @@
     transform: translateX(0);
   }
 
-  /* ✅ como o botão agora fica na TopBar, escondemos aqui */
   .sidebar-expand-btn {
     display: none !important;
   }
 
-  /* Backdrop (mobile) */
   .sidebar-backdrop {
     position: fixed;
     inset: 0;
@@ -145,7 +136,7 @@
   }
 
   .sidebar-title {
-    font-size: 1.5rem; /* levemente menor ajuda no mobile */
+    font-size: 1.5rem; 
   }
   .sidebar-main {
     display: none;
@@ -155,7 +146,6 @@
     display: flex;
   }
 
-  /* Footer aparece apenas quando expanded */
   .sidebar-footer {
     display: none;
   }

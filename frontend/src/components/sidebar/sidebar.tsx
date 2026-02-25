@@ -11,7 +11,7 @@ interface SidebarProps {
   user?: User;
   onLogout: () => void;
   openSidebar?: boolean;
-  toggleSidebar?: () => void; // no mobile, passe uma função que FECHA
+  toggleSidebar?: () => void; 
 }
 
 const Sidebar: React.FC<SidebarProps> = ({
@@ -28,7 +28,6 @@ const Sidebar: React.FC<SidebarProps> = ({
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // ✅ trava o scroll do body quando a sidebar estiver aberta no mobile
   useEffect(() => {
     if (!isMobile) return;
 
@@ -44,12 +43,11 @@ const Sidebar: React.FC<SidebarProps> = ({
   }, [isMobile, openSidebar]);
 
   const closeMobile = () => {
-    if (isMobile) toggleSidebar?.(); // no dashboard, passe closeSidebar aqui
+    if (isMobile) toggleSidebar?.();
   };
 
   return (
     <>
-      {/* Backdrop */}
       {isMobile && (
         <div
           className={`sidebar-backdrop ${openSidebar ? "open" : ""}`}
@@ -93,7 +91,7 @@ const Sidebar: React.FC<SidebarProps> = ({
             </div>
 
             <div className="sidebar-buttons">
-              <button onClick={onLogout}>Deslogar</button>
+              <button onClick={onLogout}>Sair</button>
             </div>
           </div>
         )}

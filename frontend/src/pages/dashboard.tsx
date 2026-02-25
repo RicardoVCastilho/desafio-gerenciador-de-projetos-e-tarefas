@@ -1,9 +1,10 @@
 // Dashboard.tsx
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "sonner";
 import api from "../api/axios";
-import Sidebar from "../components/sidebar/sidebar";
-import ProjectDetailsModal from "../components/projectdetails/projectdetailsmodal";
+import Sidebar from "../components/sideBar/sideBar";
+import ProjectDetailsModal from "../components/projectDetails/projectDetailsmodal";
 import "./Dashboard.css";
 
 interface Project {
@@ -40,7 +41,22 @@ function Dashboard() {
     return () => window.removeEventListener("resize", onResize);
   }, []);
 
-  // Buscar projetos + total de tarefas por projeto
+  const closeSidebar = () => setSidebarOpen(false);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
+
+  const handleLogout = () => {
+    try {
+      if (isMobile) closeSidebar();
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      toast.info("Você saiu da sua conta com segurança.");
+    } finally {
+      navigate("/");
+    }
+  };
+
   useEffect(() => {
     if (!token) {
       navigate("/");
@@ -74,7 +90,6 @@ function Dashboard() {
                 tasksCount,
               } as Project;
             } catch {
-              // se falhar só em um projeto, não quebra a lista toda
               return {
                 _id: p._id,
                 title: p.title,
@@ -96,15 +111,6 @@ function Dashboard() {
 
     fetchProjects();
   }, [navigate, token]);
-
-  const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    navigate("/");
-  };
-
-  const closeSidebar = () => setSidebarOpen(false);
-  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   const openProjectModal = (projectId: string) => {
     if (isMobile) closeSidebar();
@@ -164,10 +170,7 @@ function Dashboard() {
       </div>
 
       {selectedProjectId && (
-        <ProjectDetailsModal
-          projectId={selectedProjectId}
-          onClose={() => setSelectedProjectId(null)}
-        />
+        <ProjectDetailsModal projectId={selectedProjectId} onClose={() => setSelectedProjectId(null)} />
       )}
     </div>
   );
