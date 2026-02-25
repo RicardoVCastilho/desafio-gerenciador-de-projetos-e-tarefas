@@ -3,7 +3,7 @@ import Login from "./pages/login";
 import Register from "./pages/register";
 import Dashboard from "./pages/dashboard";
 import Projects from "./pages/projects";
-import ProjectDetails from "./components/projectdetails";
+import ProjectDetails from "./components/projectdetails/projectdetails";
 
 function App() {
   return (

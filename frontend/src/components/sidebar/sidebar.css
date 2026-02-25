@@ -1,0 +1,166 @@
+/* Sidebar principal */
+.dashboard-sidebar {
+  width: 260px;
+  background-color: #1f1f1f;
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-shadow: 3px 0 10px rgba(0, 0, 0, 0.3);
+  height: 100vh;
+  transition: transform 0.3s ease; /* ✅ melhor que "all" */
+}
+
+/* Cabeçalho */
+.sidebar-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.sidebar-title {
+  font-size: 1.8rem;
+  margin: 0;
+  color: #fff;
+}
+
+/* Conteúdo principal */
+.sidebar-main {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+  flex: 1; /* empurra o footer para baixo */
+}
+
+.sidebar-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.projects-link {
+  font-size: 1.3rem;
+  color: #fff;
+  text-decoration: none;
+  padding: 0.3rem 0;
+  position: relative;
+}
+
+.projects-link::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -2px;
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+
+.projects-link:hover::after {
+  transform: scaleX(1);
+}
+
+/* Footer com usuário e botão */
+.sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-user {
+  text-align: center;
+  margin-bottom: 1rem;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  background-color: #2a2a2a;
+}
+
+.sidebar-buttons button {
+  width: 100%;
+  padding: 0.7rem;
+  background: linear-gradient(90deg, #4f46e5, #6366f1);
+  border: none;
+  border-radius: 8px;
+  font-weight: bold;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.sidebar-buttons button:hover {
+  transform: scale(1.03);
+}
+
+/* MOBILE */
+@media (max-width: 768px) {
+  .dashboard-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 70%;
+    max-width: 300px;
+    transform: translateX(-100%);
+    z-index: 1400;
+    background-color: #1f1f1f;
+
+    /* ✅ melhorias */
+    overflow-y: auto; /* se tiver muito conteúdo */
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .dashboard-sidebar.active {
+    transform: translateX(0);
+  }
+
+  /* ✅ como o botão agora fica na TopBar, escondemos aqui */
+  .sidebar-expand-btn {
+    display: none !important;
+  }
+
+  /* Backdrop (mobile) */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1399;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .sidebar-backdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .sidebar-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .sidebar-title {
+    font-size: 1.5rem; /* levemente menor ajuda no mobile */
+  }
+  .sidebar-main {
+    display: none;
+  }
+
+  .sidebar-main.expanded {
+    display: flex;
+  }
+
+  /* Footer aparece apenas quando expanded */
+  .sidebar-footer {
+    display: none;
+  }
+
+  .sidebar-footer.expanded {
+    display: flex;
+  }
+}

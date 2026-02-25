@@ -159,12 +159,23 @@ export const completeProject = async (req: Request, res: Response) => {
       return res.status(400).json({ message: "Projeto já está concluído." });
     }
 
+    // ✅ 1) Concluir todas as tarefas do projeto (somente do usuário)
+    await Task.updateMany(
+      { project: id, user: req.userId, status: { $ne: "feito" } },
+      { $set: { status: "feito" } }
+    );
+
+    // ✅ 2) Concluir o projeto
     project.status = "concluido";
     await project.save();
 
-    res.json({ message: "Projeto concluído com sucesso.", project });
+    // (Opcional) retornar o projeto já atualizado + um resumo
+    return res.json({
+      message: "Projeto concluído com sucesso. Todas as tarefas foram marcadas como feito.",
+      project,
+    });
   } catch (error) {
     console.log(error);
-    res.status(500).json({ message: "Erro ao concluir projeto." });
+    return res.status(500).json({ message: "Erro ao concluir projeto." });
   }
 };

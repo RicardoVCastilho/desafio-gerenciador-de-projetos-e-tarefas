@@ -1,0 +1,297 @@
+/* ProjectDetails.css (completo + melhorias implementadas) */
+
+.pd-shell {
+  min-height: 100vh;
+  background: #f3f4f6; /* ✅ um pouco mais “app” */
+  color: #111827;
+}
+
+.pd-container {
+  max-width: 980px;
+  margin: 0 auto;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Header (vira “barra” e fica sticky) */
+.pd-header {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 12px;
+  align-items: center;
+
+  background: #ffffff;
+  padding: 14px 16px;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06);
+
+  position: sticky;
+  top: 12px;
+  z-index: 2;
+}
+
+.pd-header-main {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
+.pd-title {
+  margin: 0;
+  font-size: 1.6rem;
+  font-weight: 800;
+  color: #111827;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pd-header-actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* Buttons */
+.pd-btn {
+  border: none;
+  border-radius: 10px;
+  padding: 10px 14px;
+  cursor: pointer;
+  font-weight: 700;
+  transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+.pd-btn:hover {
+  transform: translateY(-1px);
+}
+
+.pd-btn:active {
+  transform: translateY(0);
+  opacity: 0.9;
+}
+
+.pd-btn-ghost {
+  background: #f3f4f6; /* ✅ antes era transparente */
+  color: #111827;
+}
+
+.pd-btn-secondary {
+  background: #4f46e5; /* ✅ alinhado com o roxo do sistema */
+  color: #fff;
+}
+.pd-btn-secondary:hover {
+  opacity: 0.95;
+}
+
+/* Grid */
+.pd-grid {
+  display: grid;
+  grid-template-columns: 1.2fr 0.8fr;
+  gap: 16px;
+}
+
+/* Card */
+.pd-card {
+  background: #ffffff;
+  border-radius: 16px;
+  padding: 18px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06); /* ✅ mais suave */
+}
+
+.pd-card-title {
+  margin: 0 0 10px 0;
+  font-size: 1.05rem;
+  font-weight: 800;
+  color: #111827;
+}
+
+.pd-card-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pd-text {
+  margin: 0;
+  line-height: 1.55;
+  color: #374151;
+}
+
+.pd-muted {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+/* Badges (mais “pill” e sem borda) */
+.pd-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 0.78rem; /* ✅ menor */
+  font-weight: 800;
+  border: none; /* ✅ remove borda */
+}
+
+.pd-badge-ativo {
+  background: rgba(79, 70, 229, 0.12);
+  color: #4f46e5;
+}
+.pd-badge-concluido {
+  background: rgba(16, 185, 129, 0.12);
+  color: #059669;
+}
+.pd-badge-pendente,
+.pd-badge-andamento {
+  background: rgba(245, 158, 11, 0.12);
+  color: #d97706;
+}
+.pd-badge-indefinido {
+  background: rgba(107, 114, 128, 0.12);
+  color: #6b7280;
+}
+
+/* Stats */
+.pd-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+
+.pd-stat {
+  background: #f9fafb;
+  border-radius: 14px;
+  padding: 12px;
+  border: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+.pd-stat-label {
+  display: block;
+  font-size: 0.9rem;
+  color: #6b7280;
+  margin-bottom: 4px;
+}
+
+.pd-stat-value {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #111827;
+}
+
+/* Tasks */
+.pd-tasks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pd-task {
+  position: relative; /* ✅ necessário pra borda lateral */
+  overflow: hidden;   /* ✅ segura a borda */
+  border-radius: 14px;
+  padding: 12px;
+  background: #f9fafb;
+  border: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+/* ✅ borda lateral por status (via :has) */
+.pd-task::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  background: rgba(107, 114, 128, 0.35); /* default */
+}
+
+.pd-task:has(.pd-badge-concluido)::before {
+  background: rgba(16, 185, 129, 0.6);
+}
+.pd-task:has(.pd-badge-andamento)::before,
+.pd-task:has(.pd-badge-pendente)::before {
+  background: rgba(245, 158, 11, 0.75);
+}
+.pd-task:has(.pd-badge-ativo)::before {
+  background: rgba(79, 70, 229, 0.75);
+}
+
+.pd-task-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.pd-task-title {
+  color: #111827;
+}
+
+.pd-task-desc {
+  margin: 6px 0 0 0;
+  color: #4b5563;
+  line-height: 1.45;
+}
+
+/* Empty */
+.pd-empty,
+.pd-empty-inline {
+  text-align: center;
+  color: #374151;
+}
+
+.pd-empty {
+  background: #fff;
+  padding: 22px;
+  border-radius: 16px;
+  box-shadow: 0 6px 14px rgba(0, 0, 0, 0.06); /* ✅ mais suave */
+}
+
+/* Skeleton */
+.pd-skeleton-title {
+  height: 34px;
+  border-radius: 12px;
+  background: #e5e7eb;
+}
+.pd-skeleton-card {
+  height: 140px;
+  border-radius: 16px;
+  background: #e5e7eb;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .pd-container {
+    padding: 16px;
+  }
+
+  .pd-header {
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto auto;
+
+    top: 0; /* ✅ não cobre conteúdo no mobile */
+    border-radius: 0 0 16px 16px;
+  }
+
+  .pd-header-actions {
+    grid-column: 1 / -1;
+    justify-content: flex-end;
+  }
+
+  .pd-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-stats {
+    grid-template-columns: 1fr;
+  }
+
+  .pd-title {
+    font-size: 1.3rem;
+  }
+}

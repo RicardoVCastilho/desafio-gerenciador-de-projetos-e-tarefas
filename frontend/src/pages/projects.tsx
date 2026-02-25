@@ -1,6 +1,17 @@
-import { useEffect, useState } from "react";
+// Projects.tsx
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
+import Sidebar from "../components/sidebar/sidebar";
+import "./projects.css";
+
+import EditProjectModal from "../components/editProjectModal/editProjectModal";
+import type { ProjectForEdit } from "../components/editProjectModal/editProjectModal";
+import "../components/editProjectModal/editProjectModal.css";
+
+import EditTaskModal from "../components/editTaskModal/editTaskModal";
+import type { TaskForEdit } from "../components/editTaskModal/editTaskModal";
+import "../components/editTaskModal/editTaskModal.css";
 
 interface Task {
   _id: string;
@@ -17,18 +28,47 @@ interface Project {
   tasks?: Task[];
 }
 
+interface User {
+  name: string;
+  email: string;
+}
+
 function Projects() {
+  const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const storedUser = localStorage.getItem("user");
+
+  const [user] = useState<User | null>(storedUser ? JSON.parse(storedUser) : null);
+
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const navigate = useNavigate();
-  const token = localStorage.getItem("token");
 
-  // Filtro global de projetos
+  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(() => window.innerWidth <= 768);
+
+  // ✅ modal de edição de projeto
+  const [editingProject, setEditingProject] = useState<ProjectForEdit | null>(null);
+
+  // ✅ modal de edição de tarefa
+  const [editingTask, setEditingTask] = useState<{ projectId: string; task: TaskForEdit } | null>(
+    null
+  );
+
+  // filtro global de projetos
   const [projectFilter, setProjectFilter] = useState<"todos" | "ativo" | "concluido">("todos");
 
-  // Filtros de tarefas por projeto
+  // filtros de tarefas por projeto
   const [taskFilters, setTaskFilters] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth <= 768);
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, []);
+
+  const closeSidebar = () => setSidebarOpen(false);
+  const toggleSidebar = () => setSidebarOpen((prev) => !prev);
 
   // ----------------- Buscar projetos e tarefas -----------------
   useEffect(() => {
@@ -39,7 +79,13 @@ function Projects() {
 
     const fetchProjects = async () => {
       try {
-        const res = await api.get("/projects", { headers: { Authorization: `Bearer ${token}` } });
+        setLoading(true);
+        setError("");
+
+        const res = await api.get("/projects", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
         const projectsData: Project[] = res.data;
 
         const projectsWithTasks = await Promise.all(
@@ -63,6 +109,12 @@ function Projects() {
     fetchProjects();
   }, [navigate, token]);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    navigate("/");
+  };
+
   // ----------------- Funções de Projeto -----------------
   const createProject = async (form: HTMLFormElement) => {
     const titleInput = form[0] as HTMLInputElement;
@@ -75,6 +127,7 @@ function Projects() {
         { title: titleInput.value, description: descInput.value },
         { headers: { Authorization: `Bearer ${token}` } }
       );
+
       setProjects((prev) => [...prev, { ...res.data, tasks: [] }]);
       titleInput.value = "";
       descInput.value = "";
@@ -87,7 +140,9 @@ function Projects() {
   const deleteProject = async (projectId: string, title: string) => {
     if (!confirm(`Deletar o projeto "${title}"?`)) return;
     try {
-      await api.delete(`/projects/${projectId}`, { headers: { Authorization: `Bearer ${token}` } });
+      await api.delete(`/projects/${projectId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
       setProjects((prev) => prev.filter((p) => p._id !== projectId));
     } catch (err: any) {
       console.error(err);
@@ -95,38 +150,43 @@ function Projects() {
     }
   };
 
-  const completeProject = async (projectId: string) => {
-    try {
-      await api.patch(`/projects/${projectId}/complete`, null, { headers: { Authorization: `Bearer ${token}` } });
-      setProjects((prev) =>
-        prev.map((p) => (p._id === projectId ? { ...p, status: "concluido" } : p))
-      );
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Erro ao concluir projeto");
-    }
+const completeProject = async (projectId: string) => {
+  try {
+    await api.patch(`/projects/${projectId}/complete`, null, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+
+    setProjects((prev) =>
+      prev.map((p) => {
+        if (p._id !== projectId) return p;
+
+        return {
+          ...p,
+          status: "concluido",
+          tasks: (p.tasks || []).map((t) => ({ ...t, status: "feito" })), // ✅ atualiza tasks no state
+        };
+      })
+    );
+  } catch (err: any) {
+    console.error(err);
+    alert(err.response?.data?.message || "Erro ao concluir projeto");
+  }
+};
+
+  // ✅ abre modal ao invés de prompt
+  const updateProject = (project: Project) => {
+    setEditingProject(project);
   };
 
-  const updateProject = async (project: Project) => {
-    const newTitle = prompt("Novo título", project.title);
-    const newDescription = prompt("Nova descrição", project.description);
-    if (!newTitle || !newDescription) return;
+  // ✅ salva edição do modal
+  const saveProjectEdit = async (projectId: string, data: { title: string; description: string }) => {
+    await api.put(`/projects/${projectId}`, data, {
+      headers: { Authorization: `Bearer ${token}` },
+    });
 
-    try {
-      await api.put(
-        `/projects/${project._id}`,
-        { title: newTitle, description: newDescription },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProjects((prev) =>
-        prev.map((p) =>
-          p._id === project._id ? { ...p, title: newTitle, description: newDescription } : p
-        )
-      );
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Erro ao atualizar projeto");
-    }
+    setProjects((prev) =>
+      prev.map((p) => (p._id === projectId ? { ...p, title: data.title, description: data.description } : p))
+    );
   };
 
   // ----------------- Funções de Tarefas -----------------
@@ -138,12 +198,7 @@ function Projects() {
     try {
       const res = await api.post(
         "/tasks",
-        {
-          projectId,
-          title: titleInput.value,
-          description: descInput.value,
-          status: "a_fazer",
-        },
+        { projectId, title: titleInput.value, description: descInput.value, status: "a_fazer" },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -160,42 +215,55 @@ function Projects() {
     }
   };
 
-  const updateTask = async (projectId: string, task: Task) => {
-    const newTitle = prompt("Novo título", task.title);
-    const newDesc = prompt("Nova descrição", task.description);
-    if (!newTitle || !newDesc) return;
-
-    try {
-      await api.put(
-        `/tasks/${task._id}`,
-        { title: newTitle, description: newDesc },
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-      setProjects((prev) =>
-        prev.map((p) =>
-          p._id === projectId
-            ? {
-                ...p,
-                tasks: p.tasks?.map((t) => (t._id === task._id ? { ...t, title: newTitle, description: newDesc } : t)),
-              }
-            : p
-        )
-      );
-    } catch (err: any) {
-      console.error(err);
-      alert(err.response?.data?.message || "Erro ao atualizar tarefa");
-    }
+  // ✅ abre modal de edição de tarefa
+  const updateTask = (projectId: string, task: Task) => {
+    setEditingTask({ projectId, task });
   };
 
-  const updateTaskStatus = async (projectId: string, task: Task, newStatus?: "a_fazer" | "em_progresso" | "feito") => {
+  // ✅ salva edição da tarefa (PUT + PATCH status)
+  const saveTaskEdit = async (
+    projectId: string,
+    taskId: string,
+    data: { title: string; description: string; status: Task["status"] }
+  ) => {
+    await api.put(
+      `/tasks/${taskId}`,
+      { title: data.title, description: data.description },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    await api.patch(
+      `/tasks/${taskId}/status`,
+      { status: data.status },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    setProjects((prev) =>
+      prev.map((p) =>
+        p._id === projectId
+          ? {
+              ...p,
+              tasks: p.tasks?.map((t) =>
+                t._id === taskId ? { ...t, title: data.title, description: data.description, status: data.status } : t
+              ),
+            }
+          : p
+      )
+    );
+  };
+
+  const updateTaskStatus = async (projectId: string, task: Task, newStatus: Task["status"]) => {
     try {
-      const statusToSend = newStatus || task.status;
-      await api.patch(`/tasks/${task._id}/status`, { status: statusToSend }, { headers: { Authorization: `Bearer ${token}` } });
+      await api.patch(
+        `/tasks/${task._id}/status`,
+        { status: newStatus },
+        { headers: { Authorization: `Bearer ${token}` } }
+      );
 
       setProjects((prev) =>
         prev.map((p) =>
           p._id === projectId
-            ? { ...p, tasks: p.tasks?.map((t) => (t._id === task._id ? { ...t, status: statusToSend } : t)) }
+            ? { ...p, tasks: p.tasks?.map((t) => (t._id === task._id ? { ...t, status: newStatus } : t)) }
             : p
         )
       );
@@ -210,9 +278,7 @@ function Projects() {
     try {
       await api.delete(`/tasks/${task._id}`, { headers: { Authorization: `Bearer ${token}` } });
       setProjects((prev) =>
-        prev.map((p) =>
-          p._id === projectId ? { ...p, tasks: p.tasks?.filter((t) => t._id !== task._id) } : p
-        )
+        prev.map((p) => (p._id === projectId ? { ...p, tasks: p.tasks?.filter((t) => t._id !== task._id) } : p))
       );
     } catch (err: any) {
       console.error(err);
@@ -220,103 +286,201 @@ function Projects() {
     }
   };
 
-  // ----------------- Render -----------------
+  const filteredProjects = useMemo(() => {
+    return projects.filter((p) => projectFilter === "todos" || p.status === projectFilter);
+  }, [projects, projectFilter]);
+
   return (
-    <div>
-      <h1>ProTsK - Projetos</h1>
+    <div className="projects-shell">
+      {/* TopBar mobile */}
+      {isMobile && (
+        <header className="projects-topbar">
+          <button className="projects-menu-btn" onClick={toggleSidebar} aria-label="Abrir menu">
+            ☰
+          </button>
 
-      <div style={{ marginBottom: "1rem" }}>
-        <button onClick={() => navigate("/dashboard")}>Voltar para Dashboard</button>
-      </div>
+          <div className="projects-topbar-title">
+            <span className="projects-topbar-title-main">Projetos</span>
+            {user?.name && <span className="projects-topbar-sub">{user.name}</span>}
+          </div>
 
-      <h2>Criar novo projeto</h2>
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          createProject(e.target as HTMLFormElement);
-        }}
-      >
-        <input type="text" placeholder="Título do projeto" />
-        <input type="text" placeholder="Descrição do projeto" />
-        <button>Criar Projeto</button>
-      </form>
+          <div className="projects-topbar-spacer" />
+        </header>
+      )}
 
-      {loading && <p>Carregando...</p>}
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {!loading && !error && projects.length === 0 && <p>Nenhum projeto encontrado.</p>}
+      <div className="projects-container">
+        <Sidebar
+          user={user ?? undefined}
+          onLogout={handleLogout}
+          openSidebar={sidebarOpen}
+          toggleSidebar={isMobile ? closeSidebar : undefined}
+        />
 
-      <div style={{ marginBottom: "1rem" }}>
-        <label>Filtrar projetos: </label>
-        <select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value as "todos" | "ativo" | "concluido")}>
-          <option value="todos">Todos</option>
-          <option value="ativo">Ativo</option>
-          <option value="concluido">Concluído</option>
-        </select>
-      </div>
+        <main className="projects-main">
+          <div className="projects-header">
+            <div>
+              <h2 className="projects-title">Projetos</h2>
+              <p className="projects-subtitle">Crie projetos, gerencie tarefas e acompanhe status.</p>
+            </div>
 
-      {!loading &&
-        !error &&
-        projects
-          .filter((project) => projectFilter === "todos" || project.status === projectFilter)
-          .map((project) => {
-            // Filtro de tarefas deste projeto
-            const filteredTasks = project.tasks?.filter((task) =>
-              task.title.toLowerCase().includes((taskFilters[project._id] || "").toLowerCase()) ||
-              task.description.toLowerCase().includes((taskFilters[project._id] || "").toLowerCase())
-            );
+            <div className="projects-actions">
+              <button className="btn-ghost" onClick={() => navigate("/dashboard")}>
+                Voltar
+              </button>
 
-            return (
-              <div key={project._id} style={{ border: "1px solid #ccc", margin: "1rem", padding: "1rem" }}>
-                <h2>
-                  {project.title} ({project.status})
-                </h2>
-                <p>{project.description}</p>
-
-                <button onClick={() => updateProject(project)}>Atualizar Projeto</button>
-                <button onClick={() => completeProject(project._id)}>Concluir Projeto</button>
-                <button onClick={() => deleteProject(project._id, project.title)}>Deletar Projeto</button>
-
-                <h3>Tarefas:</h3>
-
-                <input
-                  type="text"
-                  placeholder="Pesquisar tarefas..."
-                  value={taskFilters[project._id] || ""}
-                  onChange={(e) => setTaskFilters((prev) => ({ ...prev, [project._id]: e.target.value }))}
-                  style={{ marginBottom: "1rem", display: "block" }}
-                />
-
-                <ul>
-                  {filteredTasks?.map((task) => (
-                    <li key={task._id}>
-                      <strong>{task.title}</strong> ({task.status}) - {task.description}
-                      <select
-                        value={task.status}
-                        onChange={(e) => updateTaskStatus(project._id, task, e.target.value as "a_fazer" | "em_progresso" | "feito")}
-                      >
-                        <option value="a_fazer">A Fazer</option>
-                        <option value="em_progresso">Em Progresso</option>
-                        <option value="feito">Feito</option>
-                      </select>
-                      <button onClick={() => updateTask(project._id, task)}>Editar</button>
-                      <button onClick={() => deleteTask(project._id, task)}>Deletar</button>
-                    </li>
-                  ))}
-                </ul>
-
-                <form
-                  onSubmit={(e) => {
-                    e.preventDefault();
-                    addTask(project._id, e.target as HTMLFormElement);
-                  }}
-                >
-                  <input type="text" placeholder="Título da tarefa" />
-                  <input type="text" placeholder="Descrição da tarefa" />
-                  <button>Adicionar Tarefa</button>
-                </form>
+              <div className="filter">
+                <label>Filtro:</label>
+                <select value={projectFilter} onChange={(e) => setProjectFilter(e.target.value as any)}>
+                  <option value="todos">Todos</option>
+                  <option value="ativo">Ativo</option>
+                  <option value="concluido">Concluído</option>
+                </select>
               </div>
-            );
-          })}
+            </div>
+          </div>
+
+          {/* Criar projeto */}
+          <section className="card">
+            <h3 className="card-title">Criar novo projeto</h3>
+            <form
+              className="form-row"
+              onSubmit={(e) => {
+                e.preventDefault();
+                createProject(e.target as HTMLFormElement);
+              }}
+            >
+              <input type="text" placeholder="Título do projeto" />
+              <input type="text" placeholder="Descrição do projeto" />
+              <button className="btn-primary" type="submit">
+                Criar
+              </button>
+            </form>
+          </section>
+
+          {loading && <p>Carregando...</p>}
+          {error && <p className="error-text">{error}</p>}
+          {!loading && !error && filteredProjects.length === 0 && <p>Nenhum projeto encontrado.</p>}
+
+          {/* Lista de projetos */}
+          <div className="projects-list">
+            {!loading &&
+              !error &&
+              filteredProjects.map((project) => {
+                const q = taskFilters[project._id] || "";
+                const filteredTasks = (project.tasks || []).filter(
+                  (t) =>
+                    t.title.toLowerCase().includes(q.toLowerCase()) ||
+                    t.description.toLowerCase().includes(q.toLowerCase())
+                );
+
+                return (
+                  <section key={project._id} className="card">
+                    <div className="project-head">
+                      <div className="project-head-left">
+                        <h3 className="project-title">{project.title}</h3>
+                        <span className={`badge ${project.status === "concluido" ? "badge-done" : "badge-active"}`}>
+                          {project.status === "concluido" ? "Concluído" : "Ativo"}
+                        </span>
+                      </div>
+
+                      <div className="project-head-actions">
+                        <button className="btn-ghost" onClick={() => updateProject(project)}>
+                          Editar
+                        </button>
+                        <button className="btn-ghost" onClick={() => completeProject(project._id)}>
+                          Concluir
+                        </button>
+                        <button className="btn-danger" onClick={() => deleteProject(project._id, project.title)}>
+                          Deletar
+                        </button>
+                      </div>
+                    </div>
+
+                    <p className="project-desc">{project.description}</p>
+
+                    <input
+                      className="task-search"
+                      type="text"
+                      placeholder="Pesquisar tarefas..."
+                      value={q}
+                      onChange={(e) => setTaskFilters((prev) => ({ ...prev, [project._id]: e.target.value }))}
+                    />
+
+                    <div className="tasks">
+                      {filteredTasks.map((task) => (
+                        <div key={task._id} className="task">
+                          <div className="task-main">
+                            <div className="task-title-row">
+                              <strong>{task.title}</strong>
+                              <span className={`task-badge task-${task.status}`}>
+                                {task.status === "a_fazer"
+                                  ? "A fazer"
+                                  : task.status === "em_progresso"
+                                  ? "Em progresso"
+                                  : "Feito"}
+                              </span>
+                            </div>
+                            <p className="task-desc">{task.description}</p>
+                          </div>
+
+                          <div className="task-actions">
+                            <select
+                              value={task.status}
+                              onChange={(e) => updateTaskStatus(project._id, task, e.target.value as Task["status"])}
+                            >
+                              <option value="a_fazer">A Fazer</option>
+                              <option value="em_progresso">Em Progresso</option>
+                              <option value="feito">Feito</option>
+                            </select>
+
+                            <button className="btn-ghost" onClick={() => updateTask(project._id, task)}>
+                              Editar
+                            </button>
+                            <button className="btn-danger" onClick={() => deleteTask(project._id, task)}>
+                              Deletar
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <form
+                      className="form-row form-row-task"
+                      onSubmit={(e) => {
+                        e.preventDefault();
+                        addTask(project._id, e.target as HTMLFormElement);
+                      }}
+                    >
+                      <input type="text" placeholder="Título da tarefa" />
+                      <input type="text" placeholder="Descrição da tarefa" />
+                      <button className="btn-primary" type="submit">
+                        Adicionar
+                      </button>
+                    </form>
+                  </section>
+                );
+              })}
+          </div>
+
+          {/* ✅ Modal de edição do projeto */}
+          {editingProject && (
+            <EditProjectModal
+              project={editingProject}
+              onClose={() => setEditingProject(null)}
+              onSave={(data) => saveProjectEdit(editingProject._id, data)}
+            />
+          )}
+
+          {/* ✅ Modal de edição da tarefa */}
+          {editingTask && (
+            <EditTaskModal
+              task={editingTask.task}
+              onClose={() => setEditingTask(null)}
+              onSave={(data) => saveTaskEdit(editingTask.projectId, editingTask.task._id, data)}
+            />
+          )}
+        </main>
+      </div>
     </div>
   );
 }

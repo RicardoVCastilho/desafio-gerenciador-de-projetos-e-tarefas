@@ -1,0 +1,143 @@
+/* projectDetailsModal.css */
+
+/* Overlay */
+.pdm-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  z-index: 2000;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding: 18px;
+}
+
+/* ✅ O dialog agora é o "card único" */
+.pdm-dialog {
+  width: min(980px, 100%);
+  max-height: 90vh;
+  overflow: auto;
+
+  background: #ffffff;          /* ✅ card branco */
+  border-radius: 18px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.25);
+
+  position: relative;
+  padding: 18px;                /* ✅ padding do card único */
+}
+
+/* Botão X */
+.pdm-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 10;
+
+  width: 42px;
+  height: 42px;
+
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+
+  background: #111827;
+  color: #fff;
+  opacity: 0.92;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.pdm-close:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+.pdm-close:active {
+  transform: translateY(0);
+}
+
+/* ====== Overrides pra virar "um card só" ====== */
+
+/* shell não precisa de fundo nem min-height */
+.pd-shell-modal {
+  min-height: auto;
+  background: transparent;
+}
+
+/* remove gaps e padding extra */
+.pd-shell-modal .pd-container {
+  padding: 0;
+  gap: 0; /* ✅ sem espaços entre blocos */
+}
+
+/* header vira parte do card único (sem “barra” separada) */
+.pd-shell-modal .pd-header {
+  position: static;
+  top: auto;
+  z-index: auto;
+
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0 52px 14px 0; /* ✅ espaço pro X (direita) + respiro */
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  margin-bottom: 14px;
+}
+
+/* grid sem gap; empilha as “seções” */
+.pd-shell-modal .pd-grid {
+  grid-template-columns: 1fr;
+  gap: 0; /* ✅ sem gap */
+  border-bottom: 1px solid rgba(17, 24, 39, 0.08);
+  padding-bottom: 14px;
+  margin-bottom: 14px;
+}
+
+/* desliga os cards internos */
+.pd-shell-modal .pd-card {
+  background: transparent;
+  box-shadow: none;
+  border-radius: 0;
+  padding: 0; /* ✅ sem padding extra */
+}
+
+/* separa "Descrição" e "Resumo" com uma divisória */
+.pd-shell-modal .pd-grid .pd-card + .pd-card {
+  border-top: 1px solid rgba(17, 24, 39, 0.08);
+  margin-top: 14px;
+  padding-top: 14px;
+}
+
+/* tarefas: mantém tudo dentro, sem card externo */
+.pd-shell-modal .pd-card-head {
+  margin-bottom: 12px;
+}
+
+/* tarefas individuais continuam bonitinhas */
+.pd-shell-modal .pd-task {
+  background: #f9fafb;
+  border: 1px solid rgba(17, 24, 39, 0.06);
+}
+
+/* Mobile: sheet */
+@media (max-width: 768px) {
+  .pdm-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .pdm-dialog {
+    max-height: 92vh;
+    border-radius: 18px 18px 0 0;
+    padding: 14px;
+  }
+
+  .pd-shell-modal .pd-header {
+    padding-right: 52px;
+  }
+
+  .pd-shell-modal .pd-stats {
+    grid-template-columns: 1fr; /* já fica bem no mobile */
+  }
+}
