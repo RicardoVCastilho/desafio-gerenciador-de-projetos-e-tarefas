@@ -82,8 +82,6 @@ Além dos requisitos do desafio, o projeto inclui um **sistema completo de usuá
 - **Hash de senha** com bcryptjs
 - **Persistência de usuários** no MongoDB (Mongoose)
 
-> Observação: o JWT é enviado pelo frontend e utilizado no backend para validar e autorizar requisições.
-
 ---
 
 ## 🧑‍💻 Autor
